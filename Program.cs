@@ -118,7 +118,15 @@ namespace mdt112_assignment2
         ///This function sort given garbage list by its size ascendingly 
         ///from small, medium to large with an option to sort reversely.
         ///</summary>
-        public static List<Garbage> SortGarbageListBySize( List<Garbage> garbageList, bool isReverse ){
+        public static List<Garbage> SortGarbageListBySize( List<Garbage> garbageList, bool isReverse )
+        {
+            if (isReverese)
+           {
+                garbageList.Sort((x,y)=>((int)y.GetSize()).CompareTo((int)x.GetSize()));             
+           }else
+           {
+                garbageList.Sort((x,y)=>((int)y.GetSize()).CompareTo((int)x.GetSize()));  
+           }
             return garbageList;
         }
 
@@ -126,8 +134,12 @@ namespace mdt112_assignment2
         ///This function filter out only sellable garbage from given
         ///garbage list.
         ///</summary>
-        public static List<Garbage> GetSellableGarbageList( List<Garbage> garbageList ){
-            //  NOTE: Read more on this link https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/is
+        public static List<Garbage> GetSellableGarbageList( List<Garbage> garbageList )
+        {
+            foreach (var garbage in garbageList)
+            {
+                if (garbage is ISellable) sellableGarbageList.Add(garbage);
+            }
             return garbageList;
         }
 
@@ -138,8 +150,27 @@ namespace mdt112_assignment2
         ///disassemblement cost to pay.
         ///</summary>
         public static float ComputeMaximumSellPrice( List<Garbage> garbageList ){
-            //  NOTE: Read more on this link https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/types/casting-and-type-conversions
-            return 0.0f;
+           float totalPrice = 0;
+            foreach (var garbage in garbageList)
+            {
+                
+                if (garbage is IDisassemblable)
+                {
+                    totalPrice -= ((IDisassemblable)garbage).GetDisassembleCost();
+                   
+                    foreach (var disassembleItem in ((ElectronicsGarbage)garbage).Disassemble())
+                    {
+                        totalPrice += disassembleItem.GetSellPrice();
+                        
+                    }
+                } else if (garbage is ISellable)
+                {
+                    totalPrice += ((ISellable)garbage).GetSellPrice();
+                   
+                }
+                
+            }
+            return totalPrice;
         }
     }
 
